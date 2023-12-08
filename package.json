@@ -1,16 +1,16 @@
 {
-  "name": "lower-case-dashed-name-of-project",
+  "name": "giggling-gardens",
   "repository": "cos426finalproject",
   "version": "0.1.0",
-  "title": "PROJECT TITLE HERE",
+  "title": "Giggling Gardens",
   "description": "SHORT DESCRIPTION OF PROJECT HERE. ONE TO TWO SENTENCES MAX",
   "keywords": [
     "Princeton",
     "graphics",
     "three.js",
     "COS 426",
-    "keywor0d",
-    "keyword1",
+    "gardening",
+    "plants",
     "keyword2-etc",
     "but this last entry CANNOT have a comma after it ->"
   ],
