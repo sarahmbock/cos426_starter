@@ -22,7 +22,7 @@ class SeedScene extends Scene {
         const land = new Land();
         const flower = new Flower(this);
         const water = new Water();
-        water.position.set(-1,0,0)
+        water.position.set(-1,3.7,0)
         water.scale.set(0.25,0.25,0.25)
         const lights = new BasicLights();
         this.add(land, flower, water, lights);
