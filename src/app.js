@@ -9,6 +9,8 @@
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
+import * as THREE from 'three';
+
 
 // Initialize core ThreeJS components
 const scene = new SeedScene();
@@ -53,3 +55,56 @@ const windowResizeHandler = () => {
 };
 windowResizeHandler();
 window.addEventListener('resize', windowResizeHandler, false);
+
+// -------------------------------------------------
+const mousePosition = new THREE.Vector2();
+const raycaster = new THREE.Raycaster();
+let intersects;
+let objects = [];
+
+window.addEventListener('mousemove', function(e) {
+    mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mousePosition, camera);
+    intersects = raycaster.intersectObject(scene.planeMesh);
+    if(intersects.length > 0) {
+        const intersect = intersects[0];
+        const highlightPos = new THREE.Vector3().copy(intersect.point).floor().addScalar(0.5);
+        scene.highlightMesh.position.set(highlightPos.x, 0, highlightPos.z);
+
+        const objectExist = objects.find(function(object) {
+            return (object.position.x === scene.highlightMesh.position.x)
+            && (object.position.z === scene.highlightMesh.position.z)
+        });
+
+        if(!objectExist)
+            scene.highlightMesh.material.color.setHex(0xFFFFFF);
+        else
+            scene.highlightMesh.material.color.setHex(0xFF0000);
+    }
+});
+window.addEventListener('mousedown', function() {
+    const objectExist = objects.find(function(object) {
+        return (object.position.x === scene.highlightMesh.position.x)
+        && (object.position.z === scene.highlightMesh.position.z)
+    });
+
+    if(!objectExist) {
+        if(intersects.length > 0) {
+            // const sphereClone = scene.sphereMesh.clone();
+            // sphereClone.position.copy(scene.highlightMesh.position);
+            // scene.add(sphereClone);
+            // objects.push(sphereClone);
+            // scene.highlightMesh.material.color.setHex(0xFF0000);
+
+
+            // create new flower
+            const new_flower = scene.addFlower(scene.highlightMesh.position);
+            // console.log(scene.highlightMesh.position);
+            objects.push(new_flower);
+            scene.highlightMesh.material.color.setHex(0xFF0000);
+        }
+    }
+    console.log(scene.children.length);
+});
+// -------------------------------------------------
