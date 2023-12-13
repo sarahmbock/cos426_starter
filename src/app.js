@@ -18,7 +18,8 @@ const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
 
 // Set up camera
-camera.position.set(6, 3, -10);
+//camera.position.set(6, 3, -10);
+camera.position.set(0, 3, -13);
 camera.lookAt(new Vector3(0, 0, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
@@ -42,7 +43,14 @@ const onAnimationFrameHandler = (timeStamp) => {
     controls.update();
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
+
+    // Update the points display
+    pointsDisplayDiv.innerText = `Points: ${scene.points}`;
+
+   
+    
     window.requestAnimationFrame(onAnimationFrameHandler);
+    
 };
 window.requestAnimationFrame(onAnimationFrameHandler);
 
@@ -81,30 +89,54 @@ window.addEventListener('mousemove', function(e) {
             scene.highlightMesh.material.color.setHex(0xFFFFFF);
         else
             scene.highlightMesh.material.color.setHex(0xFF0000);
+        
+            // make water move?
+            if (scene.game_state == 'watering'){
+
+                const targetPosition = new THREE.Vector3(scene.highlightMesh.position.x, 3, scene.highlightMesh.position.z);
+                scene.water.position.set(targetPosition.x, targetPosition.y, targetPosition.z);
+                scene.water.scale.set(0.25,0.25,0.25);
+                
+            }
+            else if (scene.game_state == 'planting'){
+
+                const targetPosition = new THREE.Vector3(scene.highlightMesh.position.x, scene.highlightMesh.position.y, scene.highlightMesh.position.z);
+                scene.trackingSeed.position.set(targetPosition.x, 0.1, targetPosition.z);
+                
+            }
     }
-});
-window.addEventListener('mousedown', function() {
-    const objectExist = objects.find(function(object) {
-        return (object.position.x === scene.highlightMesh.position.x)
-        && (object.position.z === scene.highlightMesh.position.z)
-    });
-
-    if(!objectExist) {
-        if(intersects.length > 0) {
-            // const sphereClone = scene.sphereMesh.clone();
-            // sphereClone.position.copy(scene.highlightMesh.position);
-            // scene.add(sphereClone);
-            // objects.push(sphereClone);
-            // scene.highlightMesh.material.color.setHex(0xFF0000);
-
-
-            // create new flower
-            const new_flower = scene.addFlower(scene.highlightMesh.position);
-            // console.log(scene.highlightMesh.position);
-            objects.push(new_flower);
-            scene.highlightMesh.material.color.setHex(0xFF0000);
+    // move water back to starting position if not hovering over shelf
+    else if (scene.game_state == 'watering'){
+            scene.water.position.set(-1,3.7,0);
         }
+    else if (scene.game_state == 'planting'){
+        scene.trackingSeed.position.set(0,4.3,-1);
     }
-    console.log(scene.children.length);
 });
+// Mouse click on screen
+window.addEventListener('mousedown', function(e) {
+    mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mousePosition, camera, objects);
+    const new_obj = scene.screenClick(mousePosition, raycaster);
+    if (new_obj) {
+        objects.push(new_obj);
+    }
+
+});
+
+
+
+
+
+// -------------------------------------------------
+// Add this line to create and append the points display div
+const pointsDisplayDiv = document.createElement('div');
+pointsDisplayDiv.id = 'pointsDisplay';
+pointsDisplayDiv.style.position = 'absolute';
+pointsDisplayDiv.style.top = '40px';
+pointsDisplayDiv.style.left = '80px';
+pointsDisplayDiv.style.color = 'white';
+pointsDisplayDiv.style.fontSize = '30px';
+document.body.appendChild(pointsDisplayDiv);
 // -------------------------------------------------

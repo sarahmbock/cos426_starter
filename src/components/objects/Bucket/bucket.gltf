@@ -1,0 +1,49 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "THREE.GLTFExporter"
+  },
+  "scenes": [
+    {
+      "nodes": [0]
+    }
+  ],
+  "scene": 0,
+  "nodes": [
+    {
+      "name": "WateringPot",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "mode": 4,
+          "attributes": {
+            "POSITION": 1,
+            "NORMAL": 2,
+            "TEXCOORD_0": 3
+          },
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.8, 0.8, 0.2, 1.0],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8
+      },
+      "name": "WateringPotMaterial"
+    }
+  ],
+  "accessors": [
+  ],
+  "bufferViews": [
+  ],
+  "buffers": [
+  ]
+}

@@ -1,0 +1,1 @@
+export { default as Dig } from './Dig.js';
