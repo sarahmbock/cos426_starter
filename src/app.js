@@ -46,6 +46,15 @@ const onAnimationFrameHandler = (timeStamp) => {
 
     // Update the points display
     pointsDisplayDiv.innerText = `Points: ${scene.points}`;
+    // update the timer display
+    //timerDisplayDiv.innerText = `Time Left: ${scene.timeLeft} seconds`;
+    // Callback function to update the timer display from the animation loop
+function updateTimerDisplayFromAnimationLoop(time) {
+    updateTimerDisplay(time);
+  }
+  
+  // Start the timer with the callback function
+  //startTimer(updateTimerDisplayFromAnimationLoop);
 
    
     
@@ -139,4 +148,209 @@ pointsDisplayDiv.style.left = '80px';
 pointsDisplayDiv.style.color = 'white';
 pointsDisplayDiv.style.fontSize = '30px';
 document.body.appendChild(pointsDisplayDiv);
+
+
+
+
+// show time left on timer?
+// ... (Your existing code)
+
+// Create and append the timer display HTML dynamically
+const timerDisplayDiv = document.createElement('div');
+timerDisplayDiv.id = 'timerDisplay';
+timerDisplayDiv.className = 'timer-display';
+timerDisplayDiv.style.position = 'absolute';
+timerDisplayDiv.style.top = '20px';
+timerDisplayDiv.style.left = '50%';
+timerDisplayDiv.style.transform = 'translateX(-50%)';
+timerDisplayDiv.style.color = 'white';
+timerDisplayDiv.style.fontSize = '24px';
+document.body.appendChild(timerDisplayDiv);
+
+// ... (Your existing code)
+
+
+
+
+
+// addd start popup
+
+// Create and append the modal HTML dynamically
+const modalDiv = document.createElement('div');
+modalDiv.id = 'myModal';
+modalDiv.className = 'modal';
+
+const modalContentDiv = document.createElement('div');
+modalContentDiv.className = 'modal-content';
+
+const readyParagraph = document.createElement('p');
+readyParagraph.innerText = 'Ready?';
+
+const startButton = document.createElement('button');
+startButton.id = 'startButton';
+startButton.innerText = 'Start';
+
+modalContentDiv.appendChild(readyParagraph);
+modalContentDiv.appendChild(startButton);
+modalDiv.appendChild(modalContentDiv);
+document.body.appendChild(modalDiv);
+
+// Add this function to show the modal
+function showModal() {
+  modalDiv.style.display = 'block';
+}
+
+// Add this function to hide the modal
+function hideModal() {
+  modalDiv.style.display = 'none';
+}
+
+// Add event listener to the Start button
+//startButton.addEventListener('click', hideModal);
+
+// Show the modal when the page loads
+window.addEventListener('load', showModal);
+
+
+// Append the styles to the document head
+const styleElement = document.createElement('style');
+styleElement.innerHTML = `
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    text-align: center;
+  }
+
+  #startButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .popup {
+    display: none;
+    position: fixed;
+    z-index: 2;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+  }
+`;
+
+
+// add timer
+// Create and append the game over popup HTML dynamically
+const gameOverDiv = document.createElement('div');
+gameOverDiv.id = 'gameOverPopup';
+gameOverDiv.className = 'popup';
+gameOverDiv.innerHTML = '<p>Game Over! <br> Total points: ' + scene.points + '</p>';
+document.body.appendChild(gameOverDiv);
+
+
+
+let timerId;
+
+// Add this function to start the timer
+// function startTimer() {
+//   // Set the timer to 60 seconds (60,000 milliseconds)
+//   timerId = setTimeout(() => {
+//     // Show the "Game Over" popup when the timer expires
+//     showGameOverPopup();
+//   }, 1000);
+// }
+
+// Update the timer display based on the remaining time
+// Declare a global variable for remaining time
+// Add this variable to store the remaining time
+let remainingTime = 5; // Initial time in seconds
+
+// Add this function to update the timer display
+function updateTimerDisplay() {
+  timerDisplayDiv.innerText = `Time Left: ${remainingTime}s`;
+}
+
+// Add this function to start the timer
+function startTimer() {
+  // Set the timer to 60 seconds (60,000 milliseconds)
+  timerId = setInterval(() => {
+    if (remainingTime > 0) {
+        remainingTime--;
+  
+        // Call the provided callback function with the updated remaining time
+       // callback(remainingTime);
+      }
+
+    // Update the timer display
+    updateTimerDisplay();
+
+    if (remainingTime === 0) {
+      // Show the "Game Over" popup when the timer reaches zero
+      showGameOverPopup();
+
+      // Stop the timer interval
+      clearInterval(timerId);
+    }
+  }, 1000); // Update every 1 second
+}
+
+// Add this function to hide the "Game Over" popup and reset the timer
+function resetGame() {
+  hideGameOverPopup();
+  remainingTime = 5; // Reset the timer to 60 seconds
+  updateTimerDisplay();
+  startTimer(); // Start the timer again
+}
+
+// Add event listener to the Start button
+startButton.addEventListener('click', () => {
+  hideModal(); // Hide the "Ready?" modal
+  resetGame(); // Start the game (reset timer)
+});
+
+
+
+// Add this function to show the "Game Over" popup
+function showGameOverPopup() {
+    console.log('game over');
+    gameOverDiv.innerHTML = '<p>Game Over! <br> Total points: ' + scene.points + '</p>';;
+  gameOverDiv.style.display = 'flex'; // Change to 'flex' to center the content
+}
+
+// Add this function to hide the "Game Over" popup
+function hideGameOverPopup() {
+  gameOverDiv.style.display = 'none';
+}
+
+// // Add event listener to the Start button
+// startButton.addEventListener('click', () => {
+//   hideModal(); // Hide the "Ready?" modal
+//   startTimer(); // Start the 60-second timer
+// });
+
+document.head.appendChild(styleElement);
+
+
+
+
+// ... (Your existing code)
+
 // -------------------------------------------------

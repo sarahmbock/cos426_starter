@@ -199,7 +199,7 @@ class SeedScene extends Scene {
     }
     addFlower(grid_square, sprout){
         // generate random number
-    const random =Math.floor(Math.random() * 3)
+    const random = Math.floor(Math.random() * 3)
     console.log(random);
     const rand = Math.floor(random);
     let flower;
