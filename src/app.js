@@ -11,7 +11,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import * as THREE from 'three';
 
-
 // Initialize core ThreeJS components
 const scene = new SeedScene();
 const camera = new PerspectiveCamera();
@@ -46,21 +45,15 @@ const onAnimationFrameHandler = (timeStamp) => {
 
     // Update the points display
     pointsDisplayDiv.innerText = `Points: ${scene.points}`;
-    // update the timer display
-    //timerDisplayDiv.innerText = `Time Left: ${scene.timeLeft} seconds`;
-    // Callback function to update the timer display from the animation loop
-function updateTimerDisplayFromAnimationLoop(time) {
-    updateTimerDisplay(time);
-  }
   
-  // Start the timer with the callback function
-  //startTimer(updateTimerDisplayFromAnimationLoop);
-
-   
-    
+    // Callback function to update the timer display from the animation loop
+    function updateTimerDisplayFromAnimationLoop(time) {
+        updateTimerDisplay(time);
+    }
+  
     window.requestAnimationFrame(onAnimationFrameHandler);
-    
 };
+
 window.requestAnimationFrame(onAnimationFrameHandler);
 
 // Resize Handler
@@ -99,21 +92,18 @@ window.addEventListener('mousemove', function(e) {
         else
             scene.highlightMesh.material.color.setHex(0xFF0000);
         
-            // make water move?
+            // Make water move
             if (scene.game_state == 'watering'){
-
                 const targetPosition = new THREE.Vector3(scene.highlightMesh.position.x, 3, scene.highlightMesh.position.z);
                 scene.water.position.set(targetPosition.x, targetPosition.y, targetPosition.z);
-                scene.water.scale.set(0.25,0.25,0.25);
-                
+                scene.water.scale.set(0.25,0.25,0.25);  
             }
             else if (scene.game_state == 'planting'){
-
                 const targetPosition = new THREE.Vector3(scene.highlightMesh.position.x, scene.highlightMesh.position.y, scene.highlightMesh.position.z);
                 scene.trackingSeed.position.set(targetPosition.x, 0.1, targetPosition.z);
-                
             }
     }
+    
     // move water back to starting position if not hovering over shelf
     else if (scene.game_state == 'watering'){
             scene.water.position.set(-1,3.7,0);
@@ -122,21 +112,18 @@ window.addEventListener('mousemove', function(e) {
         scene.trackingSeed.position.set(0,4.3,-1);
     }
 });
+
 // Mouse click on screen
 window.addEventListener('mousedown', function(e) {
     mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
     mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mousePosition, camera, objects);
-    const new_obj = scene.screenClick(mousePosition, raycaster);
+    const new_obj = scene.screenClick(raycaster);
     if (new_obj) {
         objects.push(new_obj);
     }
 
 });
-
-
-
-
 
 // -------------------------------------------------
 // Add this line to create and append the points display div
@@ -149,12 +136,6 @@ pointsDisplayDiv.style.color = 'white';
 pointsDisplayDiv.style.fontSize = '30px';
 document.body.appendChild(pointsDisplayDiv);
 
-
-
-
-// show time left on timer?
-// ... (Your existing code)
-
 // Create and append the timer display HTML dynamically
 const timerDisplayDiv = document.createElement('div');
 timerDisplayDiv.id = 'timerDisplay';
@@ -166,14 +147,6 @@ timerDisplayDiv.style.transform = 'translateX(-50%)';
 timerDisplayDiv.style.color = 'white';
 timerDisplayDiv.style.fontSize = '24px';
 document.body.appendChild(timerDisplayDiv);
-
-// ... (Your existing code)
-
-
-
-
-
-// addd start popup
 
 // Create and append the modal HTML dynamically
 const modalDiv = document.createElement('div');
@@ -205,12 +178,8 @@ function hideModal() {
   modalDiv.style.display = 'none';
 }
 
-// Add event listener to the Start button
-//startButton.addEventListener('click', hideModal);
-
 // Show the modal when the page loads
 window.addEventListener('load', showModal);
-
 
 // Append the styles to the document head
 const styleElement = document.createElement('style');
@@ -256,7 +225,6 @@ styleElement.innerHTML = `
   }
 `;
 
-
 // add timer
 // Create and append the game over popup HTML dynamically
 const gameOverDiv = document.createElement('div');
@@ -265,23 +233,10 @@ gameOverDiv.className = 'popup';
 gameOverDiv.innerHTML = '<p>Game Over! <br> Total points: ' + scene.points + '</p>';
 document.body.appendChild(gameOverDiv);
 
-
-
 let timerId;
 
-// Add this function to start the timer
-// function startTimer() {
-//   // Set the timer to 60 seconds (60,000 milliseconds)
-//   timerId = setTimeout(() => {
-//     // Show the "Game Over" popup when the timer expires
-//     showGameOverPopup();
-//   }, 1000);
-// }
-
 // Update the timer display based on the remaining time
-// Declare a global variable for remaining time
-// Add this variable to store the remaining time
-let remainingTime = 5; // Initial time in seconds
+let remainingTime = 60; // Initial time in seconds
 
 // Add this function to update the timer display
 function updateTimerDisplay() {
@@ -294,10 +249,7 @@ function startTimer() {
   timerId = setInterval(() => {
     if (remainingTime > 0) {
         remainingTime--;
-  
-        // Call the provided callback function with the updated remaining time
-       // callback(remainingTime);
-      }
+    }
 
     // Update the timer display
     updateTimerDisplay();
@@ -315,7 +267,7 @@ function startTimer() {
 // Add this function to hide the "Game Over" popup and reset the timer
 function resetGame() {
   hideGameOverPopup();
-  remainingTime = 5; // Reset the timer to 60 seconds
+  remainingTime = 60; // Reset the timer to 60 seconds
   updateTimerDisplay();
   startTimer(); // Start the timer again
 }
@@ -325,8 +277,6 @@ startButton.addEventListener('click', () => {
   hideModal(); // Hide the "Ready?" modal
   resetGame(); // Start the game (reset timer)
 });
-
-
 
 // Add this function to show the "Game Over" popup
 function showGameOverPopup() {
@@ -340,17 +290,5 @@ function hideGameOverPopup() {
   gameOverDiv.style.display = 'none';
 }
 
-// // Add event listener to the Start button
-// startButton.addEventListener('click', () => {
-//   hideModal(); // Hide the "Ready?" modal
-//   startTimer(); // Start the 60-second timer
-// });
-
 document.head.appendChild(styleElement);
-
-
-
-
-// ... (Your existing code)
-
 // -------------------------------------------------
