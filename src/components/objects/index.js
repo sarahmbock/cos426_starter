@@ -10,3 +10,4 @@ export * from './Rain';
 export * from './Bag';
 export * from './Shelf';
 export * from './Fence';
+export * from './BadFlower';

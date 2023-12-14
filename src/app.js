@@ -16,6 +16,8 @@ const scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
 
+let gamePhase = 'start'
+
 // Set up camera
 //camera.position.set(6, 3, -10);
 camera.position.set(0, 3, -13);
@@ -50,7 +52,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     function updateTimerDisplayFromAnimationLoop(time) {
         updateTimerDisplay(time);
     }
-  
+
     window.requestAnimationFrame(onAnimationFrameHandler);
 };
 
@@ -73,6 +75,11 @@ let intersects;
 let objects = [];
 
 window.addEventListener('mousemove', function(e) {
+    console.log(scene.game_state)
+    if(scene.game_state == 'death'){
+      console.log("hi")
+      showGameOverPopup();
+    }
     mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
     mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mousePosition, camera);
@@ -87,21 +94,25 @@ window.addEventListener('mousemove', function(e) {
             && (object.position.z === scene.highlightMesh.position.z)
         });
 
-        if(!objectExist)
-            scene.highlightMesh.material.color.setHex(0xFFFFFF);
-        else
-            scene.highlightMesh.material.color.setHex(0xFF0000);
+        if(gamePhase != 'start'){
+            if(!objectExist){
+                scene.highlightMesh.material.color.setHex(0xFFFFFF);
+            }
+            else {
+                scene.highlightMesh.material.color.setHex(0xFF0000);
+            }  
+        }
         
-            // Make water move
-            if (scene.game_state == 'watering'){
-                const targetPosition = new THREE.Vector3(scene.highlightMesh.position.x, 3, scene.highlightMesh.position.z);
-                scene.water.position.set(targetPosition.x, targetPosition.y, targetPosition.z);
-                scene.water.scale.set(0.25,0.25,0.25);  
-            }
-            else if (scene.game_state == 'planting'){
-                const targetPosition = new THREE.Vector3(scene.highlightMesh.position.x, scene.highlightMesh.position.y, scene.highlightMesh.position.z);
-                scene.trackingSeed.position.set(targetPosition.x, 0.1, targetPosition.z);
-            }
+        // Make water move
+        if (scene.game_state == 'watering'){
+            const targetPosition = new THREE.Vector3(scene.highlightMesh.position.x, 3, scene.highlightMesh.position.z);
+            scene.water.position.set(targetPosition.x, targetPosition.y, targetPosition.z);
+            scene.water.scale.set(0.25,0.25,0.25);  
+        }
+        else if (scene.game_state == 'planting'){
+            const targetPosition = new THREE.Vector3(scene.highlightMesh.position.x, scene.highlightMesh.position.y, scene.highlightMesh.position.z);
+            scene.trackingSeed.position.set(targetPosition.x, 0.1, targetPosition.z);
+        }
     }
     
     // move water back to starting position if not hovering over shelf
@@ -118,11 +129,12 @@ window.addEventListener('mousedown', function(e) {
     mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
     mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mousePosition, camera, objects);
-    const new_obj = scene.screenClick(raycaster);
-    if (new_obj) {
-        objects.push(new_obj);
+    if(gamePhase != 'start'){
+        const new_obj = scene.screenClick(raycaster);
+        if (new_obj) {
+            objects.push(new_obj);
+        }
     }
-
 });
 
 // -------------------------------------------------
@@ -132,8 +144,9 @@ pointsDisplayDiv.id = 'pointsDisplay';
 pointsDisplayDiv.style.position = 'absolute';
 pointsDisplayDiv.style.top = '40px';
 pointsDisplayDiv.style.left = '80px';
-pointsDisplayDiv.style.color = 'white';
+pointsDisplayDiv.style.color = 'purple';
 pointsDisplayDiv.style.fontSize = '30px';
+pointsDisplayDiv.style.fontFamily = 'Comic Sans MS';
 document.body.appendChild(pointsDisplayDiv);
 
 // Create and append the timer display HTML dynamically
@@ -144,8 +157,9 @@ timerDisplayDiv.style.position = 'absolute';
 timerDisplayDiv.style.top = '20px';
 timerDisplayDiv.style.left = '50%';
 timerDisplayDiv.style.transform = 'translateX(-50%)';
-timerDisplayDiv.style.color = 'white';
+timerDisplayDiv.style.color = 'purple';
 timerDisplayDiv.style.fontSize = '24px';
+timerDisplayDiv.style.fontFamily = 'Comic Sans MS';
 document.body.appendChild(timerDisplayDiv);
 
 // Create and append the modal HTML dynamically
@@ -158,14 +172,20 @@ modalContentDiv.className = 'modal-content';
 
 const readyParagraph = document.createElement('p');
 readyParagraph.innerText = 'Ready?';
+readyParagraph.style.fontSize = '24px';
+readyParagraph.style.fontFamily = 'Comic Sans MS';
 
 const startButton = document.createElement('button');
 startButton.id = 'startButton';
 startButton.innerText = 'Start';
+startButton.style.backgroundColor = 'SeaShell'
+startButton.style.fontSize = '20px';
+startButton.style.fontFamily = 'Comic Sans MS';
 
 modalContentDiv.appendChild(readyParagraph);
 modalContentDiv.appendChild(startButton);
 modalDiv.appendChild(modalContentDiv);
+modalContentDiv.style.backgroundColor = 'rgba(255, 245, 238, 0.8)'
 document.body.appendChild(modalDiv);
 
 // Add this function to show the modal
@@ -231,6 +251,7 @@ const gameOverDiv = document.createElement('div');
 gameOverDiv.id = 'gameOverPopup';
 gameOverDiv.className = 'popup';
 gameOverDiv.innerHTML = '<p>Game Over! <br> Total points: ' + scene.points + '</p>';
+gameOverDiv.style.fontFamily = 'Comic Sans MS';
 document.body.appendChild(gameOverDiv);
 
 let timerId;
@@ -257,6 +278,7 @@ function startTimer() {
     if (remainingTime === 0) {
       // Show the "Game Over" popup when the timer reaches zero
       showGameOverPopup();
+      gamePhase = 'start'
 
       // Stop the timer interval
       clearInterval(timerId);
@@ -274,6 +296,7 @@ function resetGame() {
 
 // Add event listener to the Start button
 startButton.addEventListener('click', () => {
+  gamePhase = 'playing'
   hideModal(); // Hide the "Ready?" modal
   resetGame(); // Start the game (reset timer)
 });
@@ -281,7 +304,12 @@ startButton.addEventListener('click', () => {
 // Add this function to show the "Game Over" popup
 function showGameOverPopup() {
     console.log('game over');
-    gameOverDiv.innerHTML = '<p>Game Over! <br> Total points: ' + scene.points + '</p>';;
+    if (scene.game_state == 'death'){
+      gameOverDiv.innerHTML = '<p>You got a bad seed! <br> Total points: ' + scene.points + '</p>';
+    }
+    else{
+      gameOverDiv.innerHTML = '<p>You ran out of time! <br> Total points: ' + scene.points + '</p>';
+    }
   gameOverDiv.style.display = 'flex'; // Change to 'flex' to center the content
 }
 

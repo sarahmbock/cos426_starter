@@ -1,7 +1,7 @@
 import * as Dat from 'dat.gui';
 import * as THREE from 'three';
 import { Scene, Color } from 'three';
-import { Flower, Water, Sprout, Seed, FlowerOne, FlowerTwo, Rain, Bag, Shelf, Fence } from 'objects';
+import { Flower, Water, Sprout, Seed, FlowerOne, FlowerTwo, Rain, Bag, Shelf, Fence, BadFlower } from 'objects';
 import { BasicLights } from 'lights';
 //import { TextureLoader } from 'three';
 //import TWEEN from '@tweenjs/tween.js'
@@ -23,7 +23,7 @@ class SeedScene extends Scene {
         };
 
         // Set background to a nice color
-        this.background = new Color(0x7ec0ee);
+        this.background = new Color(0xFED2F8);
     
         // Set up grid
         // const textureLoader = new TextureLoader();
@@ -146,25 +146,36 @@ class SeedScene extends Scene {
     // Add a random flower to scene
     addFlower(grid_square, sprout){
         // generate random number
-        const random = Math.floor(Math.random() * 3)
+        const random = Math.floor(Math.random() * 20)
         const rand = Math.floor(random);
         let flower;
-        if(rand == 0){
+        if(rand < 0){
                 flower = new Flower(this);
+                flower.scale.set(.4,.4,.4);
+                flower.position.set(grid_square.x, grid_square.y + 0.5, grid_square.z);
                 this.points += 1;
             }
-        else if (rand == 1){
+        else if (rand < 0){
             flower = new FlowerOne();
             flower.scale.set(.015,.015,.015);
+            flower.position.set(grid_square.x, grid_square.y, grid_square.z);
             this.points += 2;
+        }
+        else if (rand < 20){
+            flower = new BadFlower();
+            flower.scale.set(.15,.15,.15);
+            flower.position.set(grid_square.x, grid_square.y, grid_square.z);
+            this.game_state = 'death';
+            //console.log(this.game_state)
+            this.points == 0;
         }
         else{
             flower = new FlowerTwo();
             flower.scale.set(.015,.015,.015);
-            this.points += 5;
+            flower.position.set(grid_square.x, grid_square.y, grid_square.z);
+            this.points += 10;
         }
 
-        flower.position.set(grid_square.x, grid_square.y, grid_square.z);
         this.remove(sprout)
         this.add(flower);
         return flower
@@ -291,8 +302,9 @@ class SeedScene extends Scene {
                 this.grid_states.set(grid_code, ['flower', flower]);
             }
             // reset state
-            this.game_state = 'neutral';
-            
+            if(this.game_state != 'death'){
+                this.game_state = 'neutral';
+            }
         }
     }
 
