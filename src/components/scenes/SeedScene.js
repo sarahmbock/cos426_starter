@@ -17,7 +17,7 @@ class SeedScene extends Scene {
 
         // Init state
         this.state = {
-            gui: new Dat.GUI(), // Create GUI for scene
+            //gui: new Dat.GUI(), // Create GUI for scene
             rotationSpeed: 0,
             updateList: [],
         };
@@ -123,7 +123,7 @@ class SeedScene extends Scene {
     this.water.translateZ(offset);
 
     // Populate GUI
-    this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+    //this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
 
     addToUpdateList(object) {
@@ -146,28 +146,26 @@ class SeedScene extends Scene {
     // Add a random flower to scene
     addFlower(grid_square, sprout){
         // generate random number
-        const random = Math.floor(Math.random() * 20)
+        const random = Math.floor(Math.random() * 100)
         const rand = Math.floor(random);
         let flower;
-        if(rand < 0){
+        if(rand < 40){
                 flower = new Flower(this);
                 flower.scale.set(.4,.4,.4);
                 flower.position.set(grid_square.x, grid_square.y + 0.5, grid_square.z);
                 this.points += 1;
             }
-        else if (rand < 0){
+        else if (rand < 60){
             flower = new FlowerOne();
             flower.scale.set(.015,.015,.015);
             flower.position.set(grid_square.x, grid_square.y, grid_square.z);
             this.points += 2;
         }
-        else if (rand < 20){
+        else if (rand < 80){
             flower = new BadFlower();
             flower.scale.set(.15,.15,.15);
             flower.position.set(grid_square.x, grid_square.y, grid_square.z);
             this.game_state = 'death';
-            //console.log(this.game_state)
-            this.points == 0;
         }
         else{
             flower = new FlowerTwo();
@@ -184,9 +182,13 @@ class SeedScene extends Scene {
     addSprout(grid_square){
         this.points += 1;
         const sprout = new Sprout();
+        this.addToUpdateList(sprout)
         sprout.scale.set(.25,.25,.25);
         sprout.position.set(grid_square.x +.4, grid_square.y + 1, grid_square.z+.1);
         this.add(sprout); 
+        setTimeout(() => {
+            sprout.spin();
+        }, 2000); // 1000 milliseconds = 1 second
         return sprout   
     }
     
@@ -225,8 +227,8 @@ class SeedScene extends Scene {
             new_seed.position.set(0,4.3,-1);
             this.add(new_seed);
         }
-
-        // Case 3: click outside grid/ watering can, set state to neutral
+   
+        // Case 5: click outside grid/ watering can, set state to neutral
         else{
             if (this.game_state == 'planting'){
                 // remove tracking seed
@@ -281,7 +283,7 @@ class SeedScene extends Scene {
         }
         else if (this.game_state == 'watering'){
             // Add rain 
-            const clickPosition = new THREE.Vector3(this.highlightMesh.position.x, this.highlightMesh.position.y + 5, this.highlightMesh.position.z);
+            const clickPosition = new THREE.Vector3(this.highlightMesh.position.x, this.highlightMesh.position.y + 4, this.highlightMesh.position.z);
             console.log(grid_state);
         
             this.createRaindropParticles(clickPosition);
