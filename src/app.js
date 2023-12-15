@@ -38,8 +38,12 @@ const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.enablePan = false;
 controls.minDistance = 4;
-controls.maxDistance = 16;
+controls.maxDistance = 14;
 controls.update();
+controls.maxPolarAngle =  Math.PI / 2.3; 
+controls.minAzimuthAngle = Math.PI/1.1; 
+controls.maxAzimuthAngle = -Math.PI/1.1;  
+
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
@@ -293,8 +297,7 @@ window.addEventListener('load', showModal);
 const gameOverDiv = document.createElement('div');
 gameOverDiv.id = 'gameOverPopup';
 gameOverDiv.className = 'popup';
-gameOverDiv.innerHTML = '<p>Game Over! <br> Total points: ' + scene.points + '</p>';
-gameOverDiv.style.fontFamily = 'Comic Sans MS';
+//gameOverDiv.innerHTML = '<p>Game Over! <br> Total points: ' + scene.points + '</p>';
 
 // Create and append the refresh button dynamically
 const refreshButton = document.createElement('button');
@@ -308,7 +311,6 @@ refreshButton.style.fontFamily = 'Comic Sans MS';
 refreshButton.addEventListener('click', function() {
     location.reload(); // Reload the page when the button is clicked
 });
-gameOverDiv.appendChild(refreshButton);
 
 document.body.appendChild(gameOverDiv);
 
@@ -340,6 +342,9 @@ styleElement.innerHTML = `
     cursor: pointer;
   }
   #refreshButton {
+    position: absolute;
+    top: 400px;
+    left: 540px;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
@@ -418,6 +423,10 @@ function showGameOverPopup() {
     else{
       gameOverDiv.innerHTML = '<p>You ran out of time! <br> Total points: ' + scene.points + '</p>';
     }
+  refreshButton.style.backgroundColor = 'SeaShell'
+  gameOverDiv.style.fontFamily = 'Comic Sans MS';
+  gameOverDiv.appendChild(refreshButton);
+  gameOverDiv.style.textAlign = 'center';
   gameOverDiv.style.display = 'flex'; // Change to 'flex' to center the content
 }
 

@@ -24,7 +24,7 @@ class SeedScene extends Scene {
 
         // Init state
         this.state = {
-            //gui: new Dat.GUI(), // Create GUI for scene
+            gui: new Dat.GUI(), // Create GUI for scene
             rotationSpeed: 0,
             updateList: [],
         };
@@ -152,7 +152,7 @@ for (let i = 0; i < numfences; i++) {
     this.water.translateZ(offset);
 
     // Populate GUI
-    //this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+    this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
 
     addToUpdateList(object) {
@@ -264,7 +264,7 @@ for (let i = 0; i < numfences; i++) {
             
             // Create seed for tracking
             const new_seed = new Seed();
-            new_seed.scale.set(.1,.1,.1);
+            new_seed.scale.set(2,2,2);
             this.trackingSeed = new_seed;
             new_seed.position.set(0,4.3,-1);
             this.add(new_seed);
@@ -313,7 +313,7 @@ for (let i = 0; i < numfences; i++) {
             if(grid_state == 'empty'){
                 this.points += 1;
                 const seed = new Seed();
-                seed.scale.set(.1,.1,.1);
+                seed.scale.set(2,2,2);
                 seed.position.set(this.highlightMesh.position.x, this.highlightMesh.position.y, this.highlightMesh.position.z-.2);
                 this.add(seed);
                 this.grid_states.set(grid_code, ['seed', seed]);
