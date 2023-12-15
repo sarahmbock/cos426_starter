@@ -1,12 +1,19 @@
 import * as Dat from 'dat.gui';
 import * as THREE from 'three';
 import { Scene, Color } from 'three';
-import { Flower, Water, Sprout, Seed, FlowerOne, FlowerTwo, Rain, Bag, Shelf, Fence, BadFlower } from 'objects';
+import { Flower, Water, Sprout, Seed, FlowerOne, FlowerTwo, Rain, Bag, Shelf, Fence, BadFlower, Cloud } from 'objects';
 import { BasicLights } from 'lights';
-//import { TextureLoader } from 'three';
-//import TWEEN from '@tweenjs/tween.js'
-//import {Soil} from '../textures';
-
+import { TextureLoader } from 'three';
+import soilBaseColorImage from './soil/Ground_Dirt_007_basecolor.jpg';
+import soilNormalMapImage from './soil/Ground_Dirt_007_normal.jpg';
+import soilHeightMapImage from './soil/Ground_Dirt_007_height.png';
+import soilRoughnessMapImage from './soil/Ground_Dirt_007_roughness.jpg';
+import soilOcclusionMapImage from './soil/Ground_Dirt_007_ambientOcclusion.jpg';
+import grassBaseColorImage from './soil/Grass_001_COLOR.jpg';
+import grassNormalMapImage from './soil/Grass_001_NORM.jpg';
+import grassHeightMapImage from './soil/Grass_001_DISP.png';
+import grassRoughnessMapImage from './soil/Grass_001_ROUGH.jpg';
+import grassOcclusionMapImage from './soil/Grass_001_OCC.jpg';
 class SeedScene extends Scene {
     constructor() {
         // Call parent Scene() constructor
@@ -23,41 +30,55 @@ class SeedScene extends Scene {
         };
 
         // Set background to a nice color
-        this.background = new Color(0xFED2F8);
-    
-        // Set up grid
-        // const textureLoader = new TextureLoader();
-        // const soilTexture = textureLoader.load('soil.jpg');
-        this.planeMesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(20, 20),
-            new THREE.MeshBasicMaterial({
-                // map: soilTexture,
-                side: THREE.DoubleSide,
-                // metalness: 0.2, // Adjust these values based on your scene and lighting
-                // roughness: 0.8,
-                visible: false
-            })
-        );
-        this.planeMesh.rotateX(-Math.PI / 2);
+        this.background = new Color(0x7ec0ee);
+
+        const textureLoader = new TextureLoader();
+        const soilBaseColor = textureLoader.load(soilBaseColorImage);
+        const soilNormalMap = textureLoader.load(soilNormalMapImage);
+        const soilHeightMap = textureLoader.load(soilHeightMapImage);
+        const soilRoughnessMap = textureLoader.load(soilRoughnessMapImage);
+        const soilOcclusionMap = textureLoader.load(soilOcclusionMapImage);
+        const grassBaseColor = textureLoader.load(grassBaseColorImage);
+        const grassNormalMap = textureLoader.load(grassNormalMapImage);
+        const grassHeightMap = textureLoader.load(grassHeightMapImage);
+        const grassRoughnessMap = textureLoader.load(grassRoughnessMapImage);
+        const grassOcclusionMap = textureLoader.load(grassOcclusionMapImage);
+
+        this.soilMesh = new THREE.Mesh(new THREE.PlaneGeometry(20,20, 100, 100), new THREE.MeshStandardMaterial ({
+            map: soilBaseColor,
+            normalMap: soilNormalMap,
+            displacementMap: soilHeightMap,
+            roughnessMap: soilRoughnessMap,
+            aoMap: soilOcclusionMap,
+        }));
+        this.soilMesh.rotateX(-Math.PI / 2);
+        this.soilMesh.position.y = -0.6;
+
+        this.grassMesh = new THREE.Mesh(new THREE.PlaneGeometry(50,50, 100, 100), new THREE.MeshStandardMaterial ({
+            map: grassBaseColor,
+            normalMap: grassNormalMap,
+            displacementMap: grassHeightMap,
+            roughnessMap: grassRoughnessMap,
+            aoMap: grassOcclusionMap,
+        }));
+        this.grassMesh.rotateX(-Math.PI / 2);
+        this.grassMesh.position.y = -1;
+
         
-        this.grid = new THREE.GridHelper(20, 20);
+        const grid = new THREE.GridHelper(20, 20);
 
         this.highlightMesh = new THREE.Mesh(
             new THREE.PlaneGeometry(1, 1),
             new THREE.MeshBasicMaterial({
                 side: THREE.DoubleSide,
-                transparent: true
+                transparent: true,
+                opacity: 0.5,  // Set the opacity value (0 is fully transparent, 1 is fully opaque)
+                alphaTest: 0.5, // Adjust the alpha test value as needed
             })
         );
+        
         this.highlightMesh.rotateX(-Math.PI / 2);
-        this.highlightMesh.position.set(.5, 0, .5);
-        this.sphereMesh = new THREE.Mesh(
-            new THREE.SphereGeometry(0.4, 4, 2),
-            new THREE.MeshBasicMaterial({
-                wireframe: true,
-                color: 0xFFEA00
-            })
-        );
+        this.highlightMesh.position.set(.5, -1, .5);
 
         this.grid_states = new Map(); // Map from grid squares positions to their states
         this.raindrops = []; // Rain list
@@ -71,50 +92,58 @@ class SeedScene extends Scene {
       
         this.bag = new Bag();
         this.bag.scale.set(.25,.25,.25);
-        this.bag.position.set(3,1.8,1);
+        // this.bag.position.set(3,1.8,1);
         this.bag.position.set(0.5,.8,1);
 
         this.shelf = new Shelf();
         this.shelf.scale.set(.012,.006,.006);
         this.shelf.position.set(-0.3,3.6,0);
+
+        this.cloud1 = new Cloud();
+        this.cloud1.scale.set(0.012,.006,-.006);
+        this.cloud1.position.set(1, 6, 15);
+
+        this.cloud2 = new Cloud();
+        this.cloud2.scale.set(0.012,.006,-.006);
+        this.cloud2.position.set(-12, 4, 25);
        
         // Seed to follow mouse while planting
         this.trackingSeed = null;
         
-        this.add(this.planeMesh, this.grid, this.highlightMesh, this.water, this.lights, this.bag, this.shelf);
+        this.add(this.soilMesh, this.grassMesh, this.grid, this.highlightMesh, this.water, this.lights, this.bag, this.shelf, this.cloud1, this.cloud2);
 
     // -----------------------------------------
     const numfences = 8;
     const fence_offset = 2.4;
     const init_position = new THREE.Vector3(-8.4, 1, 10);
     
-    // Set up back fences
-    for (let i = 0; i < numfences; i++) {
-        const fence = new Fence();
-        fence.scale.set(.3,.3,.3);
-        fence.rotateY(Math.PI/2);
-        fence.position.set(init_position.x + i * fence_offset, init_position.y, init_position.z);
-        this.add(fence);
+// Set up back fences
+for (let i = 0; i < numfences; i++) {
+    const fence = new Fence();
+    fence.scale.set(.3, .3, .3);
+    fence.rotateY(Math.PI / 2);
+    fence.position.set(init_position.x + i * fence_offset, 0.5, init_position.z); // Adjusted the y value
+    this.add(fence);
+}
 
-    }
+// Right fence
+const init_position2 = new THREE.Vector3(-10, 1, 8.5);
+for (let i = 0; i < numfences; i++) {
+    const fence = new Fence();
+    fence.scale.set(.3, .3, .3);
+    fence.position.set(init_position2.x, 0.5, init_position2.z - i * fence_offset); // Adjusted the y value
+    this.add(fence);
+}
 
-    // Right fence
-    const init_position2 = new THREE.Vector3(-10, 1, 8.5);
-    for (let i = 0; i < numfences; i++) {
-        const fence = new Fence();
-        fence.scale.set(.3,.3,.3);
-        fence.position.set(init_position2.x, init_position2.y, init_position2.z - i * fence_offset);
-        this.add(fence);
-    }
-    
-    // Left fence
-    const init_position3 = new THREE.Vector3(10, 1, 8.5);
-    for (let i = 0; i < numfences; i++) {
-        const fence = new Fence();
-        fence.scale.set(.3,.3,.3);
-        fence.position.set(init_position3.x, init_position3.y, init_position3.z - i * fence_offset);
-        this.add(fence);
-    }
+// Left fence
+const init_position3 = new THREE.Vector3(10, 1, 8.5);
+for (let i = 0; i < numfences; i++) {
+    const fence = new Fence();
+    fence.scale.set(.3, .3, .3);
+    fence.position.set(init_position3.x, 0.5, init_position3.z - i * fence_offset); // Adjusted the y value
+    this.add(fence);
+}
+
 
     // -----------------------------------------
     const offset = 10;
@@ -133,6 +162,19 @@ class SeedScene extends Scene {
     update(timeStamp) {
         const { rotationSpeed, updateList } = this.state;
         this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+        
+        // Move the cloud across the screen
+        this.cloud1.position.x += 0.005;
+        this.cloud2.position.x += 0.003;
+
+
+        // If the cloud goes beyond a certain position, reset its position
+        if (this.cloud1.position.x > 20) {
+            this.cloud1.position.x = -20;
+        }
+        if (this.cloud2.position.x > 20) {
+            this.cloud2.position.x = -20;
+        }
 
         // Custom animation logic (if any)
         this.animateRaindrops();
@@ -150,10 +192,10 @@ class SeedScene extends Scene {
         const rand = Math.floor(random);
         let flower;
         if(rand < 40){
-                flower = new Flower(this);
-                flower.scale.set(.4,.4,.4);
-                flower.position.set(grid_square.x, grid_square.y + 0.5, grid_square.z);
-                this.points += 1;
+            flower = new FlowerTwo();
+            flower.scale.set(.015,.015,.015);
+            flower.position.set(grid_square.x, grid_square.y, grid_square.z);
+            this.points += 1;
             }
         else if (rand < 60){
             flower = new FlowerOne();
@@ -168,9 +210,9 @@ class SeedScene extends Scene {
             this.game_state = 'death';
         }
         else{
-            flower = new FlowerTwo();
-            flower.scale.set(.015,.015,.015);
-            flower.position.set(grid_square.x, grid_square.y, grid_square.z);
+            flower = new Flower(this);
+            flower.scale.set(.4,.4,.4);
+            flower.position.set(grid_square.x, grid_square.y + 0.5, grid_square.z);
             this.points += 10;
         }
 
@@ -196,7 +238,7 @@ class SeedScene extends Scene {
     screenClick(raycaster){
         let new_obj;
         // Case 1: Grid click
-        const intersects_grid = raycaster.intersectObject(this.planeMesh);
+        const intersects_grid = raycaster.intersectObject(this.soilMesh);
         const intersects_water = raycaster.intersectObject(this.water); // check if intersected with water
         const intersects_bag = raycaster.intersectObject(this.bag); // check if intersected with seed bag
 

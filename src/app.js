@@ -11,10 +11,12 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import * as THREE from 'three';
 
+
 // Initialize core ThreeJS components
 const scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
+
 
 let gamePhase = 'start'
 
@@ -73,6 +75,10 @@ const mousePosition = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 let intersects;
 let objects = [];
+let intersects_bag;
+let intersects_water;
+const bag_z = scene.bag.position.z;
+const water_z = scene.water.position.z;
 
 window.addEventListener('mousemove', function(e) {
     console.log(scene.game_state)
@@ -83,7 +89,22 @@ window.addEventListener('mousemove', function(e) {
     mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
     mousePosition.y = -(e.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mousePosition, camera);
-    intersects = raycaster.intersectObject(scene.planeMesh);
+    intersects = raycaster.intersectObject(scene.soilMesh);
+    intersects_bag = raycaster.intersectObject(scene.bag);
+    intersects_water = raycaster.intersectObject(scene.water);
+    if (intersects_water.length > 0) {
+      document.body.style.cursor = 'pointer';
+      scene.water.position.z = water_z - 0.6;
+    }
+    else if (intersects_bag.length > 0){
+      document.body.style.cursor = 'pointer';
+      scene.bag.position.z = bag_z - 0.6;
+    }
+    else {
+      document.body.style.cursor = 'default';
+      scene.bag.position.z = bag_z;
+      scene.water.position.z = water_z;
+    }
     if(intersects.length > 0) {
         const intersect = intersects[0];
         const highlightPos = new THREE.Vector3().copy(intersect.point).floor().addScalar(0.5);
@@ -170,6 +191,73 @@ modalDiv.className = 'modal';
 const modalContentDiv = document.createElement('div');
 modalContentDiv.className = 'modal-content';
 
+// Create and append the info box HTML dynamically
+const infoBox = document.createElement('div');
+infoBox.id = 'infoBox';
+infoBox.className = 'info-box';
+
+// Set the width, height, and styling of the info box
+infoBox.style.width = '500px';
+infoBox.style.height = '360px';
+infoBox.style.border = '5px solid #000'; // Add a border
+infoBox.style.margin = 'auto'; // Center the box horizontally
+infoBox.style.padding = '10px'; // Add padding to the content for better appearance
+
+const instruction = document.createElement('p');
+instruction.innerText = 'Instructions';
+instruction.style.fontSize = '24px';
+instruction.style.fontFamily = 'Comic Sans MS';
+instruction.style.textDecoration = 'underline';
+infoBox.appendChild(instruction);
+
+// Create an unordered list for bullet points
+const bulletList = document.createElement('ul');
+bulletList.style.listStyleType = 'circle'; // Bullet point style
+// bulletList.style.paddingLeft = '20px'; // Set padding-left for the list
+bulletList.style.fontSize = '18px';
+bulletList.style.fontFamily = 'Comic Sans MS';
+bulletList.style.textAlign = 'left'; // Align the bullet points to the left
+
+
+// Add bullet points
+const bulletPoint1 = document.createElement('li');
+bulletPoint1.innerText = 'Click on the seed bag to grab a seed';
+
+const bulletPoint2 = document.createElement('li');
+bulletPoint2.innerText = 'Click on a plot of land to plant the seed';
+
+const bulletPoint3 = document.createElement('li');
+bulletPoint3.innerText = 'Click on the watering can';
+
+const bulletPoint4 = document.createElement('li');
+bulletPoint4.innerText = 'Click on your seed to water it';
+
+const bulletPoint5 = document.createElement('li');
+bulletPoint5.innerText = 'Continue to water your flower until it blossoms!';
+
+// Append bullet points to the list
+bulletList.appendChild(bulletPoint1);
+bulletList.appendChild(bulletPoint2);
+bulletList.appendChild(bulletPoint3);
+bulletList.appendChild(bulletPoint4);
+bulletList.appendChild(bulletPoint5);
+
+
+// Append the list to the info box
+infoBox.appendChild(bulletList);
+
+// Note
+const note = document.createElement('p');
+note.innerText = 'Different flowers will get you a different number of points. Rare flowers will get you more points, so try to plant as many flowers as you can before the time runs out! And hope that you don\'t get a bad seed \;\)';
+note.style.fontSize = '18px';
+note.style.fontFamily = 'Comic Sans MS';
+// note.style.textAlign = 'left'; // Align the bullet points to the left
+infoBox.appendChild(note);
+
+
+// Append the box to the modal content
+modalContentDiv.appendChild(infoBox);
+
 const readyParagraph = document.createElement('p');
 readyParagraph.innerText = 'Ready?';
 readyParagraph.style.fontSize = '24px';
@@ -201,6 +289,29 @@ function hideModal() {
 // Show the modal when the page loads
 window.addEventListener('load', showModal);
 
+// Create and append the game over popup HTML dynamically
+const gameOverDiv = document.createElement('div');
+gameOverDiv.id = 'gameOverPopup';
+gameOverDiv.className = 'popup';
+gameOverDiv.innerHTML = '<p>Game Over! <br> Total points: ' + scene.points + '</p>';
+gameOverDiv.style.fontFamily = 'Comic Sans MS';
+
+// Create and append the refresh button dynamically
+const refreshButton = document.createElement('button');
+refreshButton.id = 'refreshButton';
+refreshButton.innerText = 'Refresh Page';
+refreshButton.style.backgroundColor = 'SeaShell';
+refreshButton.style.fontSize = '20px';
+refreshButton.style.fontFamily = 'Comic Sans MS';
+
+// Add event listener to the refresh button
+refreshButton.addEventListener('click', function() {
+    location.reload(); // Reload the page when the button is clicked
+});
+gameOverDiv.appendChild(refreshButton);
+
+document.body.appendChild(gameOverDiv);
+
 // Append the styles to the document head
 const styleElement = document.createElement('style');
 styleElement.innerHTML = `
@@ -228,6 +339,11 @@ styleElement.innerHTML = `
     font-size: 16px;
     cursor: pointer;
   }
+  #refreshButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
 
   .popup {
     display: none;
@@ -246,18 +362,10 @@ styleElement.innerHTML = `
 `;
 
 // add timer
-// Create and append the game over popup HTML dynamically
-const gameOverDiv = document.createElement('div');
-gameOverDiv.id = 'gameOverPopup';
-gameOverDiv.className = 'popup';
-gameOverDiv.innerHTML = '<p>Game Over! <br> Total points: ' + scene.points + '</p>';
-gameOverDiv.style.fontFamily = 'Comic Sans MS';
-document.body.appendChild(gameOverDiv);
-
 let timerId;
 
 // Update the timer display based on the remaining time
-let remainingTime = 60; // Initial time in seconds
+let remainingTime = 300; // Initial time in seconds
 
 // Add this function to update the timer display
 function updateTimerDisplay() {
@@ -289,7 +397,7 @@ function startTimer() {
 // Add this function to hide the "Game Over" popup and reset the timer
 function resetGame() {
   hideGameOverPopup();
-  remainingTime = 60; // Reset the timer to 60 seconds
+  remainingTime = 300; // Reset the timer to 60 seconds
   updateTimerDisplay();
   startTimer(); // Start the timer again
 }

@@ -11,3 +11,4 @@ export * from './Bag';
 export * from './Shelf';
 export * from './Fence';
 export * from './BadFlower';
+export * from './Cloud';
