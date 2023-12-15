@@ -210,8 +210,8 @@ for (let i = 0; i < numfences; i++) {
         }
         else{
             flower = new Flower(this);
-            flower.scale.set(.4,.4,.4);
-            flower.position.set(grid_square.x, grid_square.y + 0.5, grid_square.z);
+            flower.scale.set(.03,.03,.03);
+            flower.position.set(grid_square.x, grid_square.y, grid_square.z);
             this.points += 10;
         }
 
