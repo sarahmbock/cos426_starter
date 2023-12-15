@@ -91,9 +91,8 @@ class SeedScene extends Scene {
         this.lights = new BasicLights();
       
         this.bag = new Bag();
-        this.bag.scale.set(.25,.25,.25);
-        // this.bag.position.set(3,1.8,1);
-        this.bag.position.set(0.5,.8,1);
+        this.bag.scale.set(6,6,6);
+        this.bag.position.set(1,4.25,0);
 
         this.shelf = new Shelf();
         this.shelf.scale.set(.012,.006,.006);
