@@ -369,7 +369,7 @@ styleElement.innerHTML = `
 let timerId;
 
 // Update the timer display based on the remaining time
-let remainingTime = 5; // Initial time in seconds
+let remainingTime = 300; // Initial time in seconds
 
 // Add this function to update the timer display
 function updateTimerDisplay() {
@@ -401,7 +401,7 @@ function startTimer() {
 // Add this function to hide the "Game Over" popup and reset the timer
 function resetGame() {
   hideGameOverPopup();
-  remainingTime = 5; // Reset the timer to 60 seconds
+  remainingTime = 300; // Reset the timer to 60 seconds
   updateTimerDisplay();
   startTimer(); // Start the timer again
 }
