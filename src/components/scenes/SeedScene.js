@@ -285,13 +285,10 @@ for (let i = 0; i < numfences; i++) {
     }
     
     waterClick(){
-        this.game_state = 'watering';
-        console.log('watering can clicked');
-    }
+        this.game_state = 'watering';    }
     
     shovelClick(){
         this.game_state = 'planting';
-        console.log('shovel can clicked');
     }
     
     gridClick(){
@@ -325,7 +322,9 @@ for (let i = 0; i < numfences; i++) {
         else if (this.game_state == 'watering'){
             // Add rain 
             const clickPosition = new THREE.Vector3(this.highlightMesh.position.x, this.highlightMesh.position.y + 4, this.highlightMesh.position.z);
-            console.log(grid_state);
+            //console.log(grid_state);
+            //this.game_state = 'neutral';
+            
         
             this.createRaindropParticles(clickPosition);
 
@@ -377,9 +376,12 @@ for (let i = 0; i < numfences; i++) {
             this.remove(drop.mesh);
         }
         this.raindrops.length = 0; // Clear the array
+
+        
       
-        this.water.position.set(-1,3.7,10)
-        this.water.scale.set(0.4,0.4,0.4)
+        this.water.position.set(-1,3.7,10);
+        this.water.scale.set(0.4,0.4,0.4);
+        
         }, 1500);
     }
   

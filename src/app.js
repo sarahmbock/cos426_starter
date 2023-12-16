@@ -98,11 +98,11 @@ let intersects_bag;
 let intersects_water;
 const bag_z = scene.bag.position.z;
 const water_z = scene.water.position.z;
+let water_hover = false;
 
 window.addEventListener('mousemove', function(e) {
-    console.log(scene.game_state)
+    //console.log(scene.game_state)
     if(scene.game_state == 'death'){
-      console.log("hi")
       showGameOverPopup();
     }
     mousePosition.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -112,8 +112,11 @@ window.addEventListener('mousemove', function(e) {
     intersects_bag = raycaster.intersectObject(scene.bag);
     intersects_water = raycaster.intersectObject(scene.water);
     if (intersects_water.length > 0) {
+      //if (scene.water.position.z == water_z){
       document.body.style.cursor = 'pointer';
       scene.water.position.z = water_z - 0.6;
+      water_hover = true;
+      //}
     }
     else if (intersects_bag.length > 0){
       document.body.style.cursor = 'pointer';
@@ -121,8 +124,14 @@ window.addEventListener('mousemove', function(e) {
     }
     else {
       document.body.style.cursor = 'default';
+      if (water_hover){
+        scene.water.position.z = water_z;
+        water_hover = false;
+      }
       scene.bag.position.z = bag_z;
-      scene.water.position.z = water_z;
+      //scene.water.position.z = water_z;
+
+      //scene.water.position.z = water_z;
     }
     if(intersects.length > 0) {
         const intersect = intersects[0];
@@ -430,7 +439,7 @@ startButton.addEventListener('click', () => {
 
 // Add this function to show the "Game Over" popup
 function showGameOverPopup() {
-    console.log('game over');
+    //console.log('game over');
     if (scene.game_state == 'death'){
       gameOverDiv.innerHTML = '<p>You got a bad seed! <br> Total points: ' + scene.points + '</p>';
     }
