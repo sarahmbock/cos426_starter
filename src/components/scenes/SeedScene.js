@@ -259,7 +259,12 @@ for (let i = 0; i < numfences; i++) {
             if (this.trackingSeed){
                 this.remove(this.trackingSeed);
             }
+            if (this.game_state == 'watering'){
+                this.water.position.set(-1,3.7,10)
+                this.water.scale.set(0.4,0.4,0.4)
+            }
             this.game_state = 'planting';
+
             
             // Create seed for tracking
             const new_seed = new Seed();
