@@ -11,6 +11,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import * as THREE from 'three';
 import music from './sound.mp3';
+import music from './sound.mp3';
 
 
 // Initialize core ThreeJS components
@@ -33,6 +34,20 @@ window.addEventListener('click', function() {
   });
 });
 
+window.addEventListener('click', function() {
+  const listener = new THREE.AudioListener();
+  camera.add(listener);
+  // Your Three.js audio initialization code here
+  const audioLoader = new THREE.AudioLoader();
+  audioLoader.load(music, function (buffer) {
+    const sound = new THREE.Audio(listener);
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(0.5);
+    sound.play();
+    scene.add(sound);
+  });
+});
 let gamePhase = 'start'
 
 // Set up camera
