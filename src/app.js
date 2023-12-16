@@ -112,11 +112,11 @@ window.addEventListener('mousemove', function(e) {
     intersects_bag = raycaster.intersectObject(scene.bag);
     intersects_water = raycaster.intersectObject(scene.water);
     if (intersects_water.length > 0) {
-      //if (scene.water.position.z == water_z){
+      if (scene.water.position.z == water_z && scene.water.position.x == -1 && scene.water.position.y == 3.7){
       document.body.style.cursor = 'pointer';
       scene.water.position.z = water_z - 0.6;
       water_hover = true;
-      //}
+      }
     }
     else if (intersects_bag.length > 0){
       document.body.style.cursor = 'pointer';
