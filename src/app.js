@@ -10,6 +10,7 @@ import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import * as THREE from 'three';
+import music from './sound.mp3';
 
 
 // Initialize core ThreeJS components
@@ -17,6 +18,20 @@ const scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
 
+window.addEventListener('click', function() {
+  const listener = new THREE.AudioListener();
+  camera.add(listener);
+  // Your Three.js audio initialization code here
+  const audioLoader = new THREE.AudioLoader();
+  audioLoader.load(music, function (buffer) {
+    const sound = new THREE.Audio(listener);
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(0.5);
+    sound.play();
+    scene.add(sound);
+  });
+});
 
 let gamePhase = 'start'
 
@@ -369,7 +384,7 @@ styleElement.innerHTML = `
 let timerId;
 
 // Update the timer display based on the remaining time
-let remainingTime = 300; // Initial time in seconds
+let remainingTime = 60; // Initial time in seconds
 
 // Add this function to update the timer display
 function updateTimerDisplay() {
@@ -401,7 +416,7 @@ function startTimer() {
 // Add this function to hide the "Game Over" popup and reset the timer
 function resetGame() {
   hideGameOverPopup();
-  remainingTime = 300; // Reset the timer to 60 seconds
+  remainingTime = 60; // Reset the timer to 60 seconds
   updateTimerDisplay();
   startTimer(); // Start the timer again
 }
